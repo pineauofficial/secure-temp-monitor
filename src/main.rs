@@ -1,5 +1,9 @@
 use std::fs;
 use serde::Serialize;
+use std::time::Duration;
+use std::thread;
+
+const SENSOR_PATH: &str = "/sys/class/thermal/thermal_zone0/temp";
 
 #[derive(Serialize)] 
 struct TempData {
@@ -8,21 +12,32 @@ struct TempData {
 }
 
 fn main() {
-    let path = "/sys/class/thermal/thermal_zone0/temp";
-    
-    let content = fs::read_to_string(path)
-        .expect("Erreur de lecture");
-    
-    let temp_raw: f32 = content.trim().parse()
-        .expect("Pas un nombre");
-    
-    let data = TempData {
-        sensor_name: String::from("CPU_Thermal_Zone_0"),
-        value_celsius: temp_raw / 1000.0,
-    };
 
-    let json_output = serde_json::to_string_pretty(&data)
-        .expect("Erreur de sérialisation");
+    println!("Demarage de la surveillance");
 
-    println!("{}", json_output);
+    loop {
+
+        let result = fs::read_to_string(SENSOR_PATH);
+
+        match result {
+
+            Ok(content) => {
+                if let Ok(temp_raw) = content.trim().parse::<f32>() {
+                    
+                    let data = TempData {
+                        sensor_name: "CPU".to_string(),
+                        value_celsius: temp_raw / 1000.0,
+                    };
+                    
+                    let json = serde_json::to_string(&data).unwrap();
+                    println!("{}", json);
+                }
+            }
+            Err(e) => {
+                eprintln!("Erreur de lecture du capteur: {}", e);
+            }
+        }
+
+        thread::sleep(Duration::from_secs(5));
+    }
 }
