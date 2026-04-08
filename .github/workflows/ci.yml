@@ -28,5 +28,6 @@ jobs:
     - name: Build projet
       run: cargo build --release
 
-    - name: Test executable
-      run: ./target/release/secure-temp-monitor || true #true pour ne pas s'arreter si pas de capteur
+    # pas de capteur sur github, on ne peut donc pas reellement tester l'executable
+    # - name: Test executable
+    #   run: ./target/release/secure-temp-monitor || true
