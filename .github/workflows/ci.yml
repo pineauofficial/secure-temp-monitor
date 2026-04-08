@@ -27,3 +27,6 @@ jobs:
     
     - name: Build projet
       run: cargo build --release
+
+    - name: Test executable
+      run: ./target/release/secure-temp-monitor || true #true pour ne pas s'arreter si pas de capteur
