@@ -1,0 +1,29 @@
+name: Rust CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Recuperer le code
+      uses: actions/checkout@v4 #clone le code du repo
+
+    - name: Installer Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt, clippy #mise en forme et analyse qualite
+
+    - name: Analyse de code
+      run: cargo clippy -- -D warnings
+
+    - name: Lancement des tests
+      run: cargo test
+    
+    - name: Build projet
+      run: cargo build --release
